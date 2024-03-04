@@ -54,5 +54,5 @@ def main():
     if selection == "Exploratory Data Analysis":
         eda_all_data()
 
-if _name_ == "_main_":
+if main == "_main_":
     main()
