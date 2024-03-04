@@ -1,83 +1,58 @@
-import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import streamlit as st
 
 # Load data
-@st.cache_resource
-def load_data():
-    data = pd.read_csv("D:/submission/dashboard/all_data.csv")
-    return data
+all_data = pd.read_csv("all_data.csv")
 
-data = load_data()
+# Exploratory Data Analysis (EDA)
+def eda_all_data():
+    """
+    Perform Exploratory Data Analysis (EDA) on the combined dataset (all_data.csv).
+    """
 
-# Sidebar
-st.sidebar.title("Dashboard Menu")
-selected_page = st.sidebar.radio("Select a page", ["Home", "Day Data", "Hour Data"])
+    # Display the first few rows of the dataset
+    st.subheader("Exploratory Data Analysis for all_data")
+    st.write("The first few rows of the dataset:")
+    st.write(all_data.head())
+    
+    # Descriptive statistics
+    st.write("Descriptive statistics of the dataset:")
+    st.write(all_data.describe())
+    
+    # Distribution of Count per Month
+    st.write("Distribution of bike rentals per month:")
+    fig, ax = plt.subplots(figsize=(12, 6))
+    sns.barplot(x='Month', y='Count', data=all_data, estimator=sum, ci=None, palette='muted', ax=ax)
+    ax.set_title('Distribusi Jumlah Peminjaman Sepeda pada Setiap Bulan')
+    ax.set_xlabel('Bulan')
+    ax.set_ylabel('Total Jumlah Peminjaman Sepeda')
+    st.pyplot(fig)
 
-# Content
-st.title("Bike Rental Analysis Dashboard")
+    # Correlation matrix
+    st.write("Correlation matrix between numerical features:")
+    corr = all_data.corr()
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5, ax=ax)
+    ax.set_title('Correlation Matrix')
+    st.pyplot(fig)
 
-if selected_page == "Home":
-    st.write("Welcome to the Bike Rental Analysis Dashboard!")
-    st.write("Use the sidebar to navigate to different sections.")
-elif selected_page == "Day Data":
-    st.subheader("Day Data")
-    st.write(data)
+# Streamlit Dashboard
+def main():
+    """
+    Streamlit dashboard to display the results of EDA.
+    """
 
-    # Display summary statistics
-    st.subheader("Summary Statistics for Day Data")
-    st.write(data.describe())
+    st.title("Exploratory Data Analysis Dashboard")
 
-    # Visualization 1
-    st.subheader("Distribution of Bike Rentals by Month")
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='Month', y='Count', data=data, estimator='sum', ci=None, palette='muted')
-    plt.title('Distribution of Bike Rentals by Month')
-    plt.xlabel('Month')
-    plt.ylabel('Total Bike Rentals')
-    st.pyplot()
+    # Create a sidebar for navigation
+    st.sidebar.title("Navigation")
+    selection = st.sidebar.radio("Go to:", ["Exploratory Data Analysis"])
 
-    # Visualization 2
-    st.subheader("Relationship between Weather Situation and Bike Rentals")
-    plt.figure(figsize=(10, 6))
-    sns.boxplot(x='WeatherSituation', y='Count', data=data, palette='viridis')
-    plt.title('Relationship between Weather Situation and Bike Rentals')
-    plt.xlabel('Weather Situation')
-    plt.ylabel('Bike Rentals')
-    st.pyplot()
+    # Display EDA for all_data
+    if selection == "Exploratory Data Analysis":
+        eda_all_data()
 
-elif selected_page == "Hour Data":
-    st.subheader("Hour Data")
-    st.write(data)
-
-    # Display summary statistics
-    st.subheader("Summary Statistics for Hour Data")
-    st.write(data.describe())
-
-    # Check if 'Hour' is a valid column name
-if 'Hour' in data.columns:
-    # Display summary statistics
-    st.subheader("Summary Statistics for Hour Data")
-    st.write(data.describe())
-
-    # Visualization 1
-    st.subheader("Distribution of Bike Rentals by Hour")
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='Hour', y='Count', data=data, estimator='sum', ci=None, palette='muted')
-    plt.title('Distribution of Bike Rentals by Hour')
-    plt.xlabel('Hour')
-    plt.ylabel('Total Bike Rentals')
-    st.pyplot()
-else:
-    st.warning("The column 'Hour' does not exist in the dataset.")
-
-
-    # Visualization 2
-    st.subheader("Relationship between Weather Situation and Bike Rentals")
-    plt.figure(figsize=(10, 6))
-    sns.boxplot(x='WeatherSituation', y='Count', data=data, palette='viridis')
-    plt.title('Relationship between Weather Situation and Bike Rentals')
-    plt.xlabel('Weather Situation')
-    plt.ylabel('Bike Rentals')
-    st.pyplot()
+if _name_ == "_main_":
+    main()
